@@ -1,32 +1,58 @@
 import os
 from flask import Flask, request, render_template
 from lib.database_connection import get_flask_database_connection
+from lib.album_repository import AlbumRepository
+from lib.album import Album
+from lib.artist_repository import ArtistRepository
+from lib.artist import Artist
 
 # Create a new Flask app
 app = Flask(__name__)
 
 # == Your Routes Here ==
 
+@app.route('/albums', methods=['POST'])
+def post_albums():
+    db_connection = get_flask_database_connection(app)
+    album_repository = AlbumRepository(db_connection)
+    album = Album(
+        None,
+        request.form["title"],
+        request.form["release_year"],
+        request.form["artist_id"]
+    )
+    album_repository.create(album)
+    return "Album added successfully"
 
-# == Example Code Below ==
+@app.route('/albums', methods=['GET'])
+def get_albums():
+    db_connection = get_flask_database_connection(app)
+    album_repository = AlbumRepository(db_connection)
+    albums = album_repository.all()
+    return "\n".join([
+        str(album) for album in albums
+    ])
 
-# GET /emoji
-# Returns a smiley face in HTML
-# Try it:
-#   ; open http://localhost:5001/emoji
-@app.route('/emoji', methods=['GET'])
-def get_emoji():
-    # We use `render_template` to send the user the file `emoji.html`
-    # But first, it gets processed to look for placeholders like {{ emoji }}
-    # These placeholders are replaced with the values we pass in as arguments
-    return render_template('emoji.html', emoji=':)')
+@app.route("/artists", methods=['GET'])
+def get_artists():
+    db_connection = get_flask_database_connection(app)
+    artist_repository = ArtistRepository(db_connection)
+    artists = artist_repository.all()
+    return "\n".join([
+        str(artist) for artist in artists
+    ])
 
-# This imports some more example routes for you to see how they work
-# You can delete these lines if you don't need them.
-from example_routes import apply_example_routes
-apply_example_routes(app)
-
-# == End Example Code ==
+@app.route("/artists", methods=['POST'])
+def post_artists():
+    db_connection = get_flask_database_connection(app)
+    artist_repository = ArtistRepository(db_connection)
+    artist = Artist(
+        None,
+        request.form["name"],
+        request.form["genre"],
+    )
+    artist_repository.create(artist)
+    return "Artist added successfully"
 
 # These lines start the server if you run this file directly
 # They also start the server configured to use the test database

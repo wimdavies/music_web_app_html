@@ -12,6 +12,8 @@ def test_get_albums_id(page, db_connection, test_web_address):
     db_connection.seed("seeds/music_library.sql")
     page.goto(f"http://{test_web_address}/albums/1")
     expect(page.locator('h3')).to_contain_text("Doolittle")
+    expect(page.locator('p').first).to_contain_text("1989")
+    expect(page.locator('p').last).to_contain_text("Pixies")
 
 # def test_get_albums(db_connection, web_client):
 #     db_connection.seed("seeds/music_library.sql")

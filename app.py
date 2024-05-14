@@ -18,6 +18,13 @@ def get_albums():
     albums = album_repository.all()
     return render_template("albums/index.html", albums=albums)
 
+@app.route('/albums/<id>', methods=['GET'])
+def get_album(id):
+    db_connection = get_flask_database_connection(app)
+    album_repository = AlbumRepository(db_connection)
+    album = album_repository.find(id)
+    return render_template("albums/show.html", album=album)
+
 @app.route('/albums', methods=['POST'])
 def post_albums():
     db_connection = get_flask_database_connection(app)

@@ -11,6 +11,13 @@ app = Flask(__name__)
 
 # == Your Routes Here ==
 
+@app.route('/albums', methods=['GET'])
+def get_albums():
+    db_connection = get_flask_database_connection(app)
+    album_repository = AlbumRepository(db_connection)
+    albums = album_repository.all()
+    return render_template("albums/index.html", albums=albums)
+
 @app.route('/albums', methods=['POST'])
 def post_albums():
     db_connection = get_flask_database_connection(app)
@@ -23,15 +30,6 @@ def post_albums():
     )
     album_repository.create(album)
     return "Album added successfully"
-
-@app.route('/albums', methods=['GET'])
-def get_albums():
-    db_connection = get_flask_database_connection(app)
-    album_repository = AlbumRepository(db_connection)
-    albums = album_repository.all()
-    return "\n".join([
-        str(album) for album in albums
-    ])
 
 @app.route("/artists", methods=['GET'])
 def get_artists():

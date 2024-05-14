@@ -16,6 +16,19 @@ def test_get_albums_links_to_albums_id(page, db_connection, test_web_address):
     expect(page.locator('p').first).to_contain_text("1989")
     expect(page.locator('p').last).to_contain_text("Pixies")
 
+def test_get_artists(page, db_connection, test_web_address):
+    db_connection.seed("seeds/music_library.sql")
+    page.goto(f"http://{test_web_address}/artists")
+    expect(page.locator('article').first).to_contain_text("Name: Pixies")
+    expect(page.locator('article').last).to_contain_text("Genre: Jazz")
+
+def test_get_artists_links_to_artists_id(page, db_connection, test_web_address):
+    db_connection.seed("seeds/music_library.sql")
+    page.goto(f"http://{test_web_address}/artists")
+    page.get_by_text("Pixies").click()
+    expect(page.locator('h3')).to_contain_text("Pixies")
+    expect(page.locator('p')).to_contain_text("Rock")
+
 # def test_get_albums(db_connection, web_client):
 #     db_connection.seed("seeds/music_library.sql")
 #     response = web_client.get("/albums")

@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect
 from lib.database_connection import get_flask_database_connection
 from lib.album_repository import AlbumRepository
 from lib.album import Album
@@ -27,8 +27,13 @@ def get_album(id):
     artist = artist_repository.find(album.artist_id)
     return render_template("albums/show.html", album=album, artist=artist)
 
+@app.route('/albums/new', methods=['GET'])
+def get_new_album():
+    db_connection = get_flask_database_connection(app)
+    return render_template("albums/new.html")
+
 @app.route('/albums', methods=['POST'])
-def post_albums():
+def create_album():
     db_connection = get_flask_database_connection(app)
     album_repository = AlbumRepository(db_connection)
     album = Album(
@@ -37,8 +42,12 @@ def post_albums():
         request.form["release_year"],
         request.form["artist_id"]
     )
+    if not album.is_valid():
+        errors = album.generate_errors()
+        return render_template('albums/new.html', album=album, errors=errors), 422
+    
     album_repository.create(album)
-    return "Album added successfully"
+    return redirect(f"/albums/{album.id}")
 
 @app.route("/artists", methods=['GET'])
 def get_artists():

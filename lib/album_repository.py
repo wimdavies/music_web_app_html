@@ -22,10 +22,12 @@ class AlbumRepository:
         return album
 
     def create(self, album):
-        self._connection.execute(
-            "INSERT INTO albums (title, release_year, artist_id) VALUES (%s, %s, %s)",
+        rows = self._connection.execute(
+            "INSERT INTO albums (title, release_year, artist_id) VALUES (%s, %s, %s) RETURNING id",
             [album.title, album.release_year, album.artist_id]
         )
+        album.id =  rows[0]["id"]
+        # created_album = Album(row["id"], row["title"], row["release_year"], row["artist_id"])
         return None
 
     def delete(self, album_id):

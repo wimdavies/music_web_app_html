@@ -18,7 +18,8 @@ def test_create_a_record(db_connection):
     db_connection.seed("seeds/music_library.sql") # Seed our database with some test data
     repository = AlbumRepository(db_connection)
     album = Album(None, "Evermore", 2020, 3)
-    assert repository.create(album) == None
+    repository.create(album)
+    assert album.id == 13
 
     albums = repository.all()
     assert len(albums) == 13

@@ -29,24 +29,26 @@ def test_get_artists_links_to_artists_id(page, db_connection, test_web_address):
     expect(page.locator('h3')).to_contain_text("Pixies")
     expect(page.locator('p')).to_contain_text("Rock")
 
-# def test_get_albums(db_connection, web_client):
-#     db_connection.seed("seeds/music_library.sql")
-#     response = web_client.get("/albums")
-#     assert response.status_code == 200
-#     assert response.data.decode("utf-8") == "\n".join([
-#         "Album(1, Doolittle, 1989, 1)",
-#         "Album(2, Surfer Rosa, 1988, 1)",
-#         "Album(3, Waterloo, 1974, 2)",
-#         "Album(4, Super Trouper, 1980, 2)",
-#         "Album(5, Bossanova, 1990, 1)",
-#         "Album(6, Lover, 2019, 3)",
-#         "Album(7, Folklore, 2020, 3)",
-#         "Album(8, I Put a Spell on You, 1965, 4)",
-#         "Album(9, Baltimore, 1978, 4)",
-#         "Album(10, Here Comes the Sun, 1971, 4)",
-#         "Album(11, Fodder on My Wings, 1982, 4)",
-#         "Album(12, Ring Ring, 1973, 2)"
-#     ])
+def test_create_book(db_connection, page, test_web_address):
+    db_connection.seed("seeds/music_library.sql")
+    page.goto(f"http://{test_web_address}/albums")
+    page.get_by_text("Add new album").click()
+
+    page.fill("input[name='title']", "Midnights")
+    page.fill("input[name='release_year']", "2022")
+    page.fill("input[name='artist_id']", "3")
+
+    page.click("text=Create new album")
+
+    expect(page.locator("h3")).to_contain_text("Midnights")
+    expect(page.locator('p').first).to_contain_text("2022")
+    expect(page.locator('p').last).to_contain_text("Taylor Swift")
+
+def test_validate_book(db_connection, page, test_web_address):
+    db_connection.seed("seeds/music_library.sql")
+    page.goto(f"http://{test_web_address}/albums/new")
+    page.click("text=Create new album")
+    expect(page.get_by_test_id("errors")).to_contain_text("can't be blank")
 
 # def test_post_albums_success(db_connection, web_client):
 #     db_connection.seed("seeds/music_library.sql")
